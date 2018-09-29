@@ -1,0 +1,6 @@
+[submodule "include/GridDrawer"]
+	path = include/GridDrawer
+	url = ../../GridDrawer/GridDrawer/
+[submodule "ui/GridDrawer"]
+	path = ui/GridDrawer
+	url = ../../GridDrawer/GridDrawer/
