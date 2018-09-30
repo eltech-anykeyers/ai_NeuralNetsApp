@@ -13,7 +13,8 @@ TEMPLATE = app
 
 DEFINES += QT_DEPRECATED_WARNINGS
 
-CONFIG += c++17
+CONFIG += c++1z
+QMAKE_CXXFLAGS += -std=c++1z
 
 SOURCES += \
         main.cpp \

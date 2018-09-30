@@ -1,14 +1,13 @@
-#include "mainwindow.h"
-#include "ui_mainwindow.h"
+#include <ui/mainwindow.hpp>
+#include <ui/GridDrawer/griddrawer.hpp>
 
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow)
+MainWindow::MainWindow( QWidget* parent ) :
+    QMainWindow( parent )
 {
-    ui->setupUi(this);
+    GridDrawer* gd = new GridDrawer( QSize( 100, 100 ) );
+    this->setCentralWidget( gd );
 }
 
 MainWindow::~MainWindow()
 {
-    delete ui;
 }
