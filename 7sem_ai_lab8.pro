@@ -19,11 +19,15 @@ QMAKE_CXXFLAGS += -std=c++1z
 SOURCES += \
         main.cpp \
         ui/mainwindow.cpp \
-        ui/GridDrawer/griddrawer.cpp
+        ui/hebbianneuralnetworkwidget.cpp \
+        ui/GridDrawer/griddrawer.cpp \
+        ui/GridDrawer/markeddrawer.cpp
 
 HEADERS += \
         ui/mainwindow.hpp \
-        ui/GridDrawer/griddrawer.hpp
+        ui/hebbianneuralnetworkwidget.hpp \
+        ui/GridDrawer/griddrawer.hpp \
+        ui/GridDrawer/markeddrawer.hpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
