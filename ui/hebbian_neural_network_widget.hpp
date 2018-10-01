@@ -4,8 +4,8 @@
 #include <QWidget>
 #include <QVector>
 
-#include <ui/GridDrawer/markeddrawer.hpp>
-#include <ui/GridDrawer/griddrawer.hpp>
+#include <ui/GridDrawer/marked_drawer.hpp>
+#include <ui/GridDrawer/grid_drawer.hpp>
 
 class HebbianNeuralNetworkWidget : public QWidget
 {

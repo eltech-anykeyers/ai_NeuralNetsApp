@@ -1,4 +1,4 @@
-#include <ui/hebbianneuralnetworkwidget.hpp>
+#include <ui/hebbian_neural_network_widget.hpp>
 
 #include <QGridLayout>
 #include <QHBoxLayout>

@@ -1,5 +1,5 @@
-#include <ui/mainwindow.hpp>
-#include <ui/hebbianneuralnetworkwidget.hpp>
+#include <ui/main_window.hpp>
+#include <ui/hebbian_neural_network_widget.hpp>
 
 #include <QMenuBar>
 #include <QStatusBar>

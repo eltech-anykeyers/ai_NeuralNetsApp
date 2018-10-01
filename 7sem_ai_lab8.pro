@@ -18,16 +18,24 @@ QMAKE_CXXFLAGS += -std=c++1z
 
 SOURCES += \
         main.cpp \
-        ui/mainwindow.cpp \
-        ui/hebbianneuralnetworkwidget.cpp \
-        ui/GridDrawer/griddrawer.cpp \
-        ui/GridDrawer/markeddrawer.cpp
+        neural_nets/neurons/neuron.cpp \
+        neural_nets/neurons/abstract_neuron.cpp \
+        neural_nets/neurons/input_neuron.cpp \
+        neural_nets/hebbian_neural_network.cpp \
+        ui/GridDrawer/grid_drawer.cpp \
+        ui/GridDrawer/marked_drawer.cpp \
+        ui/main_window.cpp \
+        ui/hebbian_neural_network_widget.cpp
 
 HEADERS += \
-        ui/mainwindow.hpp \
-        ui/hebbianneuralnetworkwidget.hpp \
-        ui/GridDrawer/griddrawer.hpp \
-        ui/GridDrawer/markeddrawer.hpp
+        neural_nets/neurons/neuron.hpp \
+        ui/GridDrawer/grid_drawer.hpp \
+        ui/GridDrawer/marked_drawer.hpp \
+        ui/hebbian_neural_network_widget.hpp \
+        ui/main_window.hpp \
+        neural_nets/hebbian_neural_network.hpp \
+        neural_nets/neurons/input_neuron.hpp \
+        neural_nets/neurons/abstract_neuron.hpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

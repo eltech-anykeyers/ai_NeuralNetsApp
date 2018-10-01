@@ -1,6 +1,6 @@
-[submodule "include/GridDrawer"]
-	path = include/GridDrawer
-	url = ../../GridDrawer/GridDrawer/
+[submodule "neural_nets"]
+	path = neural_nets
+	url = git@github.com:eltech-anykeyers/ai_neural_nets.git
 [submodule "ui/GridDrawer"]
 	path = ui/GridDrawer
-	url = ../../GridDrawer/GridDrawer/
+	url = git@github.com:eltech-anykeyers/ai_GridDrawerWidget.git
