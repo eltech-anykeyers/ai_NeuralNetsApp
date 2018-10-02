@@ -4,3 +4,6 @@
 [submodule "ui/GridDrawer"]
 	path = ui/GridDrawer
 	url = git@github.com:eltech-anykeyers/ai_GridDrawerWidget.git
+[submodule "ui/ImageView"]
+	path = ui/ImageView
+	url = git@github.com:eltech-anykeyers/ai_ImageView.git
