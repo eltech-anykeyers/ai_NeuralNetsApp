@@ -4,8 +4,13 @@
 #include <QWidget>
 #include <QVector>
 
+#include <memory>
+
 #include <ui/GridDrawer/marked_drawer.hpp>
 #include <ui/GridDrawer/grid_drawer.hpp>
+#include <neural_nets/hebbian_neural_network.hpp>
+
+#include <QLabel>
 
 class HebbianNeuralNetworkWidget : public QWidget
 {
@@ -13,9 +18,9 @@ class HebbianNeuralNetworkWidget : public QWidget
 public:
     explicit HebbianNeuralNetworkWidget( QWidget* parent = Q_NULLPTR );
 
-signals:
-
 public slots:
+    void learn();
+    void test();
 
 private:
     constexpr static int N_SAMPLES = 4;
@@ -23,6 +28,11 @@ private:
     constexpr static int LEARNING_LAYOUT_WIDTH = 2;
 
     QVector< MarkedDrawer* > learningDrawers;
+    GridDrawer* testingDrawer;
+
+    QLabel* resultLabel;
+
+    std::shared_ptr< HebbianNeuralNetwork > hebbianNet;
 };
 
 #endif /// HEBBIANNEURALNETWORKWIDGET_HPP
