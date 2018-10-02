@@ -5,6 +5,7 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QPushButton>
+#include <QString>
 
 HebbianNeuralNetworkWidget::HebbianNeuralNetworkWidget( QWidget *parent )
     : QWidget( parent )
@@ -95,5 +96,6 @@ void HebbianNeuralNetworkWidget::test()
         return;
     }
 
-    resultLabel->setText( learningDrawers[ index ]->getMark() );
+    resultLabel->setText( QString("Match found: %1")
+                            .arg( learningDrawers[ index ]->getMark() ) );
 }
