@@ -21,7 +21,7 @@ SOURCES += \
         neural_nets/hebbian_neural_network.cpp \
         ui/GridDrawer/grid_drawer.cpp \
         ui/GridDrawer/marked_drawer.cpp \
-        ui/ImageView/image_view.cpp \
+        ui/ImageViewWidget/image_view_widget.cpp \
         ui/main_window.cpp \
         ui/hebbian_neural_network_widget.cpp \
         utils/data_converters.cpp
@@ -31,7 +31,7 @@ HEADERS += \
         neural_nets/hebbian_neural_network.hpp \
         ui/GridDrawer/grid_drawer.hpp \
         ui/GridDrawer/marked_drawer.hpp \
-        ui/ImageView/image_view.hpp \
+        ui/ImageViewWidget/image_view_widget.hpp \
         ui/hebbian_neural_network_widget.hpp \
         ui/main_window.hpp \
         utils/data_converters.hpp

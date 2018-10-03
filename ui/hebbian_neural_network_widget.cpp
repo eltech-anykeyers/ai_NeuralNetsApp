@@ -1,11 +1,14 @@
 #include <ui/hebbian_neural_network_widget.hpp>
 #include <utils/data_converters.hpp>
+#include <ui/ImageViewWidget/image_view_widget.hpp>
 
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QString>
+#include <QListWidget>
+#include <QScrollArea>
 
 HebbianNeuralNetworkWidget::HebbianNeuralNetworkWidget( QWidget *parent )
     : QWidget( parent )
@@ -30,7 +33,6 @@ HebbianNeuralNetworkWidget::HebbianNeuralNetworkWidget( QWidget *parent )
     QVBoxLayout* toolsLayout = new QVBoxLayout();
     testingDrawer = new GridDrawer( SAMPLE_SIZE );
     toolsLayout->addWidget( testingDrawer );
-    toolsLayout->addStretch();
 
     /// Create result label.
     resultLabel = new QLabel();
@@ -45,6 +47,10 @@ HebbianNeuralNetworkWidget::HebbianNeuralNetworkWidget( QWidget *parent )
     connect( testPushButton, &QPushButton::clicked,
              this, &HebbianNeuralNetworkWidget::test );
     toolsLayout->addWidget( testPushButton );
+    QPushButton* clearPushButton = new QPushButton( "Clear" );
+    connect( clearPushButton, &QPushButton::clicked,
+             this, &HebbianNeuralNetworkWidget::clear );
+    toolsLayout->addWidget( clearPushButton );
 
     /// Create main layout.
     QHBoxLayout* mainLayout = new QHBoxLayout();
@@ -98,4 +104,14 @@ void HebbianNeuralNetworkWidget::test()
 
     resultLabel->setText( QString("Match found: %1")
                             .arg( learningDrawers[ index ]->getMark() ) );
+}
+
+void HebbianNeuralNetworkWidget::clear()
+{
+    hebbianNet->clear();
+    testingDrawer->refresh();
+    for( auto& drawer : learningDrawers )
+    {
+        drawer->refresh();
+    }
 }

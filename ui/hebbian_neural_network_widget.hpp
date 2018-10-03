@@ -21,6 +21,7 @@ public:
 public slots:
     void learn();
     void test();
+    void clear();
 
 private:
     constexpr static int N_SAMPLES = 4;
