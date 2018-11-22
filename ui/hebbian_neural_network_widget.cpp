@@ -1,6 +1,7 @@
 #include <ui/hebbian_neural_network_widget.hpp>
 #include <utils/data_converters.hpp>
-#include <ui/ImageViewWidget/image_view_widget.hpp>
+#include <utils/NeuralNetworkSerializer/neural_network_learning_sample.hpp>
+#include <QFile>
 
 #include <QGridLayout>
 #include <QHBoxLayout>
@@ -8,31 +9,25 @@
 #include <QPushButton>
 #include <QString>
 #include <QListWidget>
-#include <QScrollArea>
 
-HebbianNeuralNetworkWidget::HebbianNeuralNetworkWidget( QWidget *parent )
+HebbianNeuralNetworkWidget::HebbianNeuralNetworkWidget( QWidget* parent )
+    : HebbianNeuralNetworkWidget( 4, QSize( 4, 5 ), parent )
+{}
+
+HebbianNeuralNetworkWidget::HebbianNeuralNetworkWidget(
+        quint32 nNeurons, QSize sampleSize, QWidget* parent )
     : QWidget( parent )
+    , N_NEURONS( nNeurons )
+    , SAMPLE_SIZE( sampleSize )
 {
     /// Create neural network.
     hebbianNet = std::make_shared< HebbianNeuralNetwork >(
-                SAMPLE_SIZE.height() * SAMPLE_SIZE.width(), N_SAMPLES );
+                SAMPLE_SIZE.height() * SAMPLE_SIZE.width(), N_NEURONS );
 
-    /// Crate layout with learning drawers.
-    QGridLayout* learningLayout = new QGridLayout();
-    for( int i = 0; i < N_SAMPLES; i++ )
-    {
-        auto newDrawer = new MarkedDrawer( SAMPLE_SIZE );
-        learningDrawers.append( newDrawer );
-        learningLayout->addWidget(
-            newDrawer,
-            i / LEARNING_LAYOUT_WIDTH, i % LEARNING_LAYOUT_WIDTH );
-    }
-    learningLayout->setSpacing( 10 );
-
-    /// Create layout with testingDrawer and control buttons.
+    /// Create layout with sampleDrawer and control buttons.
     QVBoxLayout* toolsLayout = new QVBoxLayout();
-    testingDrawer = new GridDrawer( SAMPLE_SIZE );
-    toolsLayout->addWidget( testingDrawer );
+    sampleDrawer = new MarkedDrawer( SAMPLE_SIZE );
+    toolsLayout->addWidget( sampleDrawer );
 
     /// Create result label.
     resultLabel = new QLabel();
@@ -51,67 +46,188 @@ HebbianNeuralNetworkWidget::HebbianNeuralNetworkWidget( QWidget *parent )
     connect( clearPushButton, &QPushButton::clicked,
              this, &HebbianNeuralNetworkWidget::clear );
     toolsLayout->addWidget( clearPushButton );
+    QPushButton* generatePushButton = new QPushButton( "Generate" );
+    toolsLayout->addWidget( generatePushButton );
+    connect( generatePushButton, &QPushButton::clicked,
+             sampleDrawer, &MarkedDrawer::generate );
+
+    /// ImageListView
+    imageListWidget = new ImageListViewWidget();
 
     /// Create main layout.
     QHBoxLayout* mainLayout = new QHBoxLayout();
-    mainLayout->addLayout( learningLayout );
     mainLayout->addLayout( toolsLayout );
+    mainLayout->addWidget( imageListWidget );
     this->setLayout( mainLayout );
 }
 
 void HebbianNeuralNetworkWidget::learn()
 {
-    QVector< qreal > target( N_SAMPLES, 0.0 );
-    for( int i = 0; i < N_SAMPLES; i++ )
+    if( quint32( imageListWidget->model()->size() ) >= N_NEURONS )
     {
-        target[ i ] = 1.0;
-        auto input =
-            DataConverters::ConvertPixelDataIntoBinary(
-                learningDrawers[ i ]->getPixelData() );
-        hebbianNet->addLearningDataSet(
-            input.toStdVector(), target.toStdVector() );
-        target[ i ] = 0.0;
+        return;
     }
+
+    /// Get target.
+    /// TODO: Create hashing function.
+    auto target = QVector< qreal >( qint32( N_NEURONS ), 0.0 );
+    auto nSamples = imageListWidget->model()->size();
+    if( nSamples >= 0 )
+    {
+        target[ nSamples ] = 1.0;
+    }
+
+    auto sample = Sample{ std::make_shared< QImage >( sampleDrawer->getImage() ),
+                          target, sampleDrawer->getMark() };
+
+    imageListWidget->model()->addImage( sample.image, sample.mark );
+
+    /// Get input.
+    auto input = DataConverters::convertImage( sampleDrawer->getImage(),
+                                               converters::colorToBinary );
+
+
+    hebbianNet->addLearningDataSet(
+        input.toStdVector(), target.toStdVector() );
     hebbianNet->learn();
+
+    samples.append( std::move( sample ) );
+
+    sampleDrawer->refresh();
 }
 
 void HebbianNeuralNetworkWidget::test()
 {
-    auto input =
-        DataConverters::ConvertPixelDataIntoBinary(
-            testingDrawer->getPixelData() );
+    ///TODO: Reimplement.
+    auto input = DataConverters::convertImage( sampleDrawer->getImage(),
+                                               converters::colorToBinary );
     QVector< qreal > result = QVector< qreal >::fromStdVector(
         hebbianNet->test( input.toStdVector() ) );
 
-    int index = -1;
-    for( int i = 0; i < result.size(); i++ )
+    if( quint32( result.size() ) != N_NEURONS ) throw std::runtime_error( "bad result" );
+
+    for( const auto& sample : samples )
     {
-        if( result[ i ] > 0.0 )
+        if( std::equal( sample.target.begin(), sample.target.end(),
+                        result.begin() ) )
         {
-            if( index == -1 ) index = i;
-            else
-            {
-                resultLabel->setText( "Bad result" );
-                return;
-            }
+            resultLabel->setText(
+                QString("Match found: %1").arg( sample.mark ) );
+            return;
         }
     }
-    if( index == -1 )
-    {
-        resultLabel->setText( "Bad result" );
-        return;
-    }
 
-    resultLabel->setText( QString("Match found: %1")
-                            .arg( learningDrawers[ index ]->getMark() ) );
+    resultLabel->setText( QString("Bad result") );
 }
 
 void HebbianNeuralNetworkWidget::clear()
 {
     hebbianNet->clear();
-    testingDrawer->refresh();
-    for( auto& drawer : learningDrawers )
+    sampleDrawer->refresh();
+    imageListWidget->model()->clear();
+    samples.clear();
+}
+
+NeuralNetworkData HebbianNeuralNetworkWidget::getNeuralNetworkData() const
+{
+    NeuralNetworkData data( N_NEURONS, SAMPLE_SIZE );
+
+    auto weights = hebbianNet->getWeights();
+    for( quint32 i = 0; i < N_NEURONS; i++ )
     {
-        drawer->refresh();
+        for( quint32 j = 0; j < data.getInputSize() + 1; j++ )
+        {
+            data.setRelationshipWeight( i, j, weights[ i ][ j ] );
+        }
+        delete[] weights[ i ];
     }
+    delete[] weights;
+
+    for( const auto& sourceSample : samples )
+    {
+        NeuralNetworkLearningSample sample;
+
+        /// Target.
+        auto targetSize = quint32( sourceSample.target.size() );
+        auto target = new qreal[ targetSize ];
+        std::copy( sourceSample.target.begin(), sourceSample.target.end(), target );
+        sample.setTargetVector( reinterpret_cast< uchar* >( target ),
+                                sizeof(qreal) * targetSize );
+
+        /// Input.
+        auto inputSize = quint32( sourceSample.image->sizeInBytes() );
+        auto input = new uchar[ inputSize ];
+        std::copy( sourceSample.image->bits(),
+                   sourceSample.image->bits() + inputSize,
+                   input );
+        sample.setInputVector( input, inputSize );
+
+        /// Mark.
+        sample.setMark( sourceSample.mark );
+
+        data.addLearningData( sample );
+    }
+
+    return data;
+}
+
+void HebbianNeuralNetworkWidget::setNeuralNetworkData( const NeuralNetworkData& data )
+{
+    if( N_NEURONS != data.getNumberOfNeurons() ) throw std::invalid_argument( "invalid number of neurons" );
+    if( SAMPLE_SIZE != data.getImageSize() ) throw std::invalid_argument( "invalid image size" );
+
+    auto weights = new qreal*[ N_NEURONS ];
+    for( quint32 i = 0; i < N_NEURONS; i++ )
+    {
+        weights[ i ] = new qreal[ data.getInputSize() ];
+        for( quint32 j = 0; j < data.getInputSize(); j++ )
+        {
+            weights[ i ][ j ] = data.getRelationshipWeight( i, j );
+        }
+    }
+
+    hebbianNet = std::make_shared< HebbianNeuralNetwork >(
+                data.getNumberOfNeurons(), data.getInputSize() + 1,
+                weights );
+
+    for( const auto& sample : data.getLearningData() )
+    {
+        auto image = QImage( data.getImageSize(), QImage::Format::Format_Mono );
+        std::copy( sample.getInputVector(),
+                   sample.getInputVector() + qint32( sample.getInputVectorSize() ),
+                   image.bits() );
+
+        QVector< qreal > target;
+        auto targetData = reinterpret_cast< qreal* >( sample.getTargetVector() );
+        std::copy( targetData,
+                   targetData + sample.getTargetVectorSize() / sizeof( qreal ),
+                   std::back_inserter( target ) );
+
+        auto result = Sample{ std::make_shared< QImage >( image ),
+                              target, sample.getMark() };
+
+        imageListWidget->model()->addImage( result.image, result.mark );
+
+        samples.append( std::move( result ) );
+    }
+}
+
+QImage HebbianNeuralNetworkWidget::getSampleImage() const
+{
+    return sampleDrawer->getImage();
+}
+
+void HebbianNeuralNetworkWidget::setSampleImage( const QImage& image )
+{
+    sampleDrawer->setImage( image );
+}
+
+QSize HebbianNeuralNetworkWidget::getSampleImageSize() const
+{
+    return sampleDrawer->getSize();
+}
+
+void HebbianNeuralNetworkWidget::setSampleImageSize( const QSize& size )
+{
+    sampleDrawer->setSize( size );
 }

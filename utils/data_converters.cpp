@@ -1,23 +1,32 @@
 #include "data_converters.hpp"
 
-QVector< qreal > DataConverters::ConvertPixelDataIntoBinary(
-    const QVector< QColor >& data )
+namespace converters {
+
+qreal colorToBinary( const QColor& color )
 {
-    QVector< qreal > result;
-    for( const auto& color : data )
-    {
-        result.push_back( color == Qt::GlobalColor::white ? 0.0 : 1.0 );
-    }
-    return result;
+    return color == Qt::GlobalColor::white ? 0.0 : 1.0;
 }
 
-QVector< qreal > DataConverters::ConvertPixelDataIntoBipolar(
-    const QVector< QColor >& data )
+qreal colorToBipolar( const QColor& color )
 {
+    return color == Qt::GlobalColor::white ? -1.0 : 1.0;
+}
+
+} /// namespace converters
+
+
+QVector< qreal > DataConverters::convertImage(
+        const QImage& img, std::function< qreal(const QColor&) > converter )
+{
+    if( img.isNull() ) return QVector< qreal >();
+
     QVector< qreal > result;
-    for( const auto& color : data )
+    for( int i = 0; i < img.width(); i++ )
     {
-        result.push_back( color == Qt::GlobalColor::white ? -1.0 : 1.0 );
+        for( int j = 0; j < img.height(); j++ )
+        {
+            result.append( converter( img.pixelColor( i, j ) ) );
+        }
     }
     return result;
 }

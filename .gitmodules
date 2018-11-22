@@ -10,3 +10,6 @@
 [submodule "ui/ImageListViewWidget"]
 	path = ui/ImageListViewWidget
 	url = git@github.com:eltech-anykeyers/ai_ImageListViewWidget.git
+[submodule "utils/NeuralNetworkSerializer"]
+	path = utils/NeuralNetworkSerializer
+	url = git@github.com:eltech-anykeyers/ai_NeuralNetworkSerializer.git

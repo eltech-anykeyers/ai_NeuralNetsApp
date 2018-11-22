@@ -26,7 +26,11 @@ SOURCES += \
         ui/hebbian_neural_network_widget.cpp \
         utils/data_converters.cpp \
         ui/ImageListViewWidget/image_list_model.cpp \
-        ui/ImageListViewWidget/image_list_item_delegate.cpp
+        ui/ImageListViewWidget/image_list_item_delegate.cpp \
+        ui/ImageListViewWidget/image_list_view_widget.cpp \
+        utils/NeuralNetworkSerializer/neural_network_serializer.cpp \
+        utils/NeuralNetworkSerializer/neural_network_data.cpp \
+        utils/NeuralNetworkSerializer/neural_network_learning_sample.cpp
 
 
 HEADERS += \
@@ -38,7 +42,11 @@ HEADERS += \
         ui/main_window.hpp \
         utils/data_converters.hpp \
         ui/ImageListViewWidget/image_list_model.hpp \
-        ui/ImageListViewWidget/image_list_item_delegate.hpp
+        ui/ImageListViewWidget/image_list_item_delegate.hpp \
+        ui/ImageListViewWidget/image_list_view_widget.hpp \
+        utils/NeuralNetworkSerializer/neural_network_serializer.hpp \
+        utils/NeuralNetworkSerializer/neural_network_data.hpp \
+        utils/NeuralNetworkSerializer/neural_network_learning_sample.hpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
