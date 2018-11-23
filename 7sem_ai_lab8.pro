@@ -28,10 +28,10 @@ SOURCES += \
         ui/ImageListViewWidget/image_list_item_delegate.cpp \
         ui/ImageListViewWidget/image_list_view_widget.cpp \
         utils/data_converters.cpp \
+        utils/activation_functions.cpp \
         utils/NeuralNetworkSerializer/neural_network_serializer.cpp \
         utils/NeuralNetworkSerializer/neural_network_data.cpp \
         utils/NeuralNetworkSerializer/neural_network_learning_sample.cpp
-
 
 HEADERS += \
         neural_nets/hebbian_neural_network.hpp \
@@ -44,6 +44,7 @@ HEADERS += \
         ui/ImageListViewWidget/image_list_item_delegate.hpp \
         ui/ImageListViewWidget/image_list_view_widget.hpp \
         utils/data_converters.hpp \
+        utils/activation_functions.hpp \
         utils/NeuralNetworkSerializer/neural_network_serializer.hpp \
         utils/NeuralNetworkSerializer/neural_network_data.hpp \
         utils/NeuralNetworkSerializer/neural_network_learning_sample.hpp
