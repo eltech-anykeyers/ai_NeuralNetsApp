@@ -52,7 +52,7 @@ private:
 
     QLabel* resultLabel;
 
-    std::shared_ptr< HebbianNeuralNetwork > hebbianNet;
+    std::shared_ptr< INeuralNetwork > neuralNetwork;
 
     const quint32 N_NEURONS;
     const QSize SAMPLE_SIZE;

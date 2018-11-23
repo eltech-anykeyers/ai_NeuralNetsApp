@@ -34,6 +34,7 @@ SOURCES += \
         utils/NeuralNetworkSerializer/neural_network_learning_sample.cpp
 
 HEADERS += \
+        neural_nets/i_neural_network.hpp \
         neural_nets/hebbian_neural_network.hpp \
         neural_nets/hamming_neural_network.hpp \
         ui/neural_nets_app.hpp \

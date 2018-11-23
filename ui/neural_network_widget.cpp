@@ -21,7 +21,7 @@ NeuralNetworkWidget::NeuralNetworkWidget(
     , SAMPLE_SIZE( sampleSize )
 {
     /// Create neural network.
-    hebbianNet = std::make_shared< HebbianNeuralNetwork >(
+    neuralNetwork = std::make_shared< HebbianNeuralNetwork >(
                 SAMPLE_SIZE.height() * SAMPLE_SIZE.width(), N_NEURONS );
 
     /// Create layout with sampleDrawer and control buttons.
@@ -87,9 +87,9 @@ void NeuralNetworkWidget::learn()
                                                converters::colorToBinary );
 
 
-    hebbianNet->addLearningDataSet(
+    neuralNetwork->addSampleToLearningDataSet(
         input.toStdVector(), target.toStdVector() );
-    hebbianNet->learn();
+    neuralNetwork->adjustConnectionsWeights();
 
     samples.append( std::move( sample ) );
 
@@ -102,7 +102,7 @@ void NeuralNetworkWidget::test()
     auto input = DataConverters::convertImage( sampleDrawer->getImage(),
                                                converters::colorToBinary );
     QVector< qreal > result = QVector< qreal >::fromStdVector(
-        hebbianNet->test( input.toStdVector() ) );
+        neuralNetwork->recognizeSample( input.toStdVector() ) );
 
     if( quint32( result.size() ) != N_NEURONS ) throw std::runtime_error( "bad result" );
 
@@ -122,7 +122,7 @@ void NeuralNetworkWidget::test()
 
 void NeuralNetworkWidget::clear()
 {
-    hebbianNet->clear();
+    neuralNetwork->clear();
     sampleDrawer->refresh();
     imageListWidget->model()->clear();
     samples.clear();
@@ -132,7 +132,7 @@ NeuralNetworkData NeuralNetworkWidget::getNeuralNetworkData() const
 {
     NeuralNetworkData data( N_NEURONS, SAMPLE_SIZE );
 
-    auto weights = hebbianNet->getWeights();
+    auto weights = neuralNetwork->getWeights();
     for( quint32 i = 0; i < N_NEURONS; i++ )
     {
         for( quint32 j = 0; j < data.getInputSize() + 1; j++ )
@@ -186,7 +186,7 @@ void NeuralNetworkWidget::setNeuralNetworkData( const NeuralNetworkData& data )
         }
     }
 
-    hebbianNet = std::make_shared< HebbianNeuralNetwork >(
+    neuralNetwork = std::make_shared< HebbianNeuralNetwork >(
                 data.getNumberOfNeurons(), data.getInputSize() + 1,
                 weights );
 
