@@ -23,7 +23,7 @@ SOURCES += \
         ui/GridDrawer/marked_drawer.cpp \
         ui/ImageViewWidget/image_view_widget.cpp \
         ui/main_window.cpp \
-        ui/hebbian_neural_network_widget.cpp \
+        ui/neural_network_widget.cpp \
         utils/data_converters.cpp \
         ui/ImageListViewWidget/image_list_model.cpp \
         ui/ImageListViewWidget/image_list_item_delegate.cpp \
@@ -38,7 +38,7 @@ HEADERS += \
         ui/GridDrawer/grid_drawer.hpp \
         ui/GridDrawer/marked_drawer.hpp \
         ui/ImageViewWidget/image_view_widget.hpp \
-        ui/hebbian_neural_network_widget.hpp \
+        ui/neural_network_widget.hpp \
         ui/main_window.hpp \
         utils/data_converters.hpp \
         ui/ImageListViewWidget/image_list_model.hpp \

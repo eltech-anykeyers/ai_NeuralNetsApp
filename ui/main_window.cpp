@@ -38,8 +38,8 @@ MainWindow::MainWindow( QWidget* parent ) :
 
     serializer = new NeuralNetworkSerializer();
 
-    hebbian = new HebbianNeuralNetworkWidget();
-    this->setCentralWidget( hebbian );
+    nnWidget = new NeuralNetworkWidget();
+    this->setCentralWidget( nnWidget );
 
     this->setWindowTitle( "AI" );
 }
@@ -49,11 +49,11 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::replaceNeuralNetworkWidget(
-        HebbianNeuralNetworkWidget* newNeuralNetworkWidget )
+        NeuralNetworkWidget* newNeuralNetworkWidget )
 {
     this->setCentralWidget( newNeuralNetworkWidget );
-    delete hebbian;
-    hebbian = newNeuralNetworkWidget;
+    delete nnWidget;
+    nnWidget = newNeuralNetworkWidget;
 }
 
 void MainWindow::openNeuralNetwork()
@@ -68,9 +68,9 @@ void MainWindow::openNeuralNetwork()
     auto data = serializer->deserialize();
 
     replaceNeuralNetworkWidget(
-                new HebbianNeuralNetworkWidget( data.getNumberOfNeurons(),
+                new NeuralNetworkWidget( data.getNumberOfNeurons(),
                                                 data.getImageSize() ) );
-    hebbian->setNeuralNetworkData( data );
+    nnWidget->setNeuralNetworkData( data );
 }
 
 void MainWindow::saveNeuralNetwork()
@@ -82,7 +82,7 @@ void MainWindow::saveNeuralNetwork()
     if( fileName.isNull() ) return;
 
     serializer->setDevice( std::make_unique< QFile >( fileName ) );
-    serializer->serialize( hebbian->getNeuralNetworkData() );
+    serializer->serialize( nnWidget->getNeuralNetworkData() );
 }
 
 void MainWindow::openImage()
@@ -95,7 +95,7 @@ void MainWindow::openImage()
 
     QImage image( fileName );
 
-    if( image.size() != hebbian->getSampleImageSize() )
+    if( image.size() != nnWidget->getSampleImageSize() )
     {
         auto result = QMessageBox::question(
                     this, "Wrong size",
@@ -103,10 +103,10 @@ void MainWindow::openImage()
                     QMessageBox::Yes | QMessageBox::No );
 
         if( result != QMessageBox::Yes ) return;
-        image = image.scaled( hebbian->getSampleImageSize() );
+        image = image.scaled( nnWidget->getSampleImageSize() );
     }
 
-    hebbian->setSampleImage( image.convertToFormat( QImage::Format_Mono ) );
+    nnWidget->setSampleImage( image.convertToFormat( QImage::Format_Mono ) );
 }
 
 void MainWindow::saveImage()
@@ -117,6 +117,6 @@ void MainWindow::saveImage()
             "Images (*.png *.xpm *.jpg)" );
     if( fileName.isNull() ) return;
 
-    auto image = hebbian->getSampleImage();
+    auto image = nnWidget->getSampleImage();
     image.save( fileName );
 }

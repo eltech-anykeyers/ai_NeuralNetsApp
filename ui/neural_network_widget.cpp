@@ -1,4 +1,4 @@
-#include <ui/hebbian_neural_network_widget.hpp>
+#include <ui/neural_network_widget.hpp>
 #include <utils/data_converters.hpp>
 #include <utils/NeuralNetworkSerializer/neural_network_learning_sample.hpp>
 #include <QFile>
@@ -10,11 +10,11 @@
 #include <QString>
 #include <QListWidget>
 
-HebbianNeuralNetworkWidget::HebbianNeuralNetworkWidget( QWidget* parent )
-    : HebbianNeuralNetworkWidget( 4, QSize( 4, 5 ), parent )
+NeuralNetworkWidget::NeuralNetworkWidget( QWidget* parent )
+    : NeuralNetworkWidget( 4, QSize( 4, 5 ), parent )
 {}
 
-HebbianNeuralNetworkWidget::HebbianNeuralNetworkWidget(
+NeuralNetworkWidget::NeuralNetworkWidget(
         quint32 nNeurons, QSize sampleSize, QWidget* parent )
     : QWidget( parent )
     , N_NEURONS( nNeurons )
@@ -37,14 +37,14 @@ HebbianNeuralNetworkWidget::HebbianNeuralNetworkWidget(
     QPushButton* learnPushButton = new QPushButton( "Learn" );
     toolsLayout->addWidget( learnPushButton );
     connect( learnPushButton, &QPushButton::clicked,
-             this, &HebbianNeuralNetworkWidget::learn );
+             this, &NeuralNetworkWidget::learn );
     QPushButton* testPushButton = new QPushButton( "Test" );
     connect( testPushButton, &QPushButton::clicked,
-             this, &HebbianNeuralNetworkWidget::test );
+             this, &NeuralNetworkWidget::test );
     toolsLayout->addWidget( testPushButton );
     QPushButton* clearPushButton = new QPushButton( "Clear" );
     connect( clearPushButton, &QPushButton::clicked,
-             this, &HebbianNeuralNetworkWidget::clear );
+             this, &NeuralNetworkWidget::clear );
     toolsLayout->addWidget( clearPushButton );
     QPushButton* generatePushButton = new QPushButton( "Generate" );
     toolsLayout->addWidget( generatePushButton );
@@ -61,7 +61,7 @@ HebbianNeuralNetworkWidget::HebbianNeuralNetworkWidget(
     this->setLayout( mainLayout );
 }
 
-void HebbianNeuralNetworkWidget::learn()
+void NeuralNetworkWidget::learn()
 {
     if( quint32( imageListWidget->model()->size() ) >= N_NEURONS )
     {
@@ -96,7 +96,7 @@ void HebbianNeuralNetworkWidget::learn()
     sampleDrawer->refresh();
 }
 
-void HebbianNeuralNetworkWidget::test()
+void NeuralNetworkWidget::test()
 {
     ///TODO: Reimplement.
     auto input = DataConverters::convertImage( sampleDrawer->getImage(),
@@ -120,7 +120,7 @@ void HebbianNeuralNetworkWidget::test()
     resultLabel->setText( QString("Bad result") );
 }
 
-void HebbianNeuralNetworkWidget::clear()
+void NeuralNetworkWidget::clear()
 {
     hebbianNet->clear();
     sampleDrawer->refresh();
@@ -128,7 +128,7 @@ void HebbianNeuralNetworkWidget::clear()
     samples.clear();
 }
 
-NeuralNetworkData HebbianNeuralNetworkWidget::getNeuralNetworkData() const
+NeuralNetworkData NeuralNetworkWidget::getNeuralNetworkData() const
 {
     NeuralNetworkData data( N_NEURONS, SAMPLE_SIZE );
 
@@ -171,7 +171,7 @@ NeuralNetworkData HebbianNeuralNetworkWidget::getNeuralNetworkData() const
     return data;
 }
 
-void HebbianNeuralNetworkWidget::setNeuralNetworkData( const NeuralNetworkData& data )
+void NeuralNetworkWidget::setNeuralNetworkData( const NeuralNetworkData& data )
 {
     if( N_NEURONS != data.getNumberOfNeurons() ) throw std::invalid_argument( "invalid number of neurons" );
     if( SAMPLE_SIZE != data.getImageSize() ) throw std::invalid_argument( "invalid image size" );
@@ -212,22 +212,22 @@ void HebbianNeuralNetworkWidget::setNeuralNetworkData( const NeuralNetworkData& 
     }
 }
 
-QImage HebbianNeuralNetworkWidget::getSampleImage() const
+QImage NeuralNetworkWidget::getSampleImage() const
 {
     return sampleDrawer->getImage();
 }
 
-void HebbianNeuralNetworkWidget::setSampleImage( const QImage& image )
+void NeuralNetworkWidget::setSampleImage( const QImage& image )
 {
     sampleDrawer->setImage( image );
 }
 
-QSize HebbianNeuralNetworkWidget::getSampleImageSize() const
+QSize NeuralNetworkWidget::getSampleImageSize() const
 {
     return sampleDrawer->getSize();
 }
 
-void HebbianNeuralNetworkWidget::setSampleImageSize( const QSize& size )
+void NeuralNetworkWidget::setSampleImageSize( const QSize& size )
 {
     sampleDrawer->setSize( size );
 }

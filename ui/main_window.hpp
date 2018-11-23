@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 
-#include <ui/hebbian_neural_network_widget.hpp>
+#include <ui/neural_network_widget.hpp>
 #include <utils/NeuralNetworkSerializer/neural_network_serializer.hpp>
 
 class MainWindow : public QMainWindow
@@ -22,10 +22,10 @@ public slots:
 
 protected:
     void replaceNeuralNetworkWidget(
-            HebbianNeuralNetworkWidget* newNeuralNetworkWidget );
+            NeuralNetworkWidget* newNeuralNetworkWidget );
 
 private:
-    HebbianNeuralNetworkWidget* hebbian;
+    NeuralNetworkWidget* nnWidget;
     NeuralNetworkSerializer* serializer;
 };
 

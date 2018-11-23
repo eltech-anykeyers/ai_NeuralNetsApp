@@ -1,5 +1,5 @@
-#ifndef HEBBIANNEURALNETWORKWIDGET_HPP
-#define HEBBIANNEURALNETWORKWIDGET_HPP
+#ifndef NEURAL_NETWORK_WIDGET_HPP
+#define NEURAL_NETWORK_WIDGET_HPP
 
 #include <QWidget>
 #include <QVector>
@@ -14,12 +14,12 @@
 
 #include <QLabel>
 
-class HebbianNeuralNetworkWidget : public QWidget
+class NeuralNetworkWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit HebbianNeuralNetworkWidget( QWidget* parent = Q_NULLPTR );
-    explicit HebbianNeuralNetworkWidget( quint32 nNeurons, QSize sampleSize,
+    explicit NeuralNetworkWidget( QWidget* parent = Q_NULLPTR );
+    explicit NeuralNetworkWidget( quint32 nNeurons, QSize sampleSize,
                                          QWidget* parent = Q_NULLPTR );
 
     NeuralNetworkData getNeuralNetworkData() const;
@@ -58,4 +58,4 @@ private:
     const QSize SAMPLE_SIZE;
 };
 
-#endif /// HEBBIANNEURALNETWORKWIDGET_HPP
+#endif /// NEURAL_NETWORK_WIDGET_HPP
