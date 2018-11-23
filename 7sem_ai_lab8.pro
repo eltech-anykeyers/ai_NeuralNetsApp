@@ -19,6 +19,7 @@ QMAKE_CXXFLAGS += -std=c++1z
 SOURCES += \
         main.cpp \
         neural_nets/hebbian_neural_network.cpp \
+        neural_nets/hamming_neural_network.cpp \
         ui/GridDrawer/grid_drawer.cpp \
         ui/GridDrawer/marked_drawer.cpp \
         ui/ImageViewWidget/image_view_widget.cpp \
@@ -35,6 +36,7 @@ SOURCES += \
 
 HEADERS += \
         neural_nets/hebbian_neural_network.hpp \
+        neural_nets/hamming_neural_network.hpp \
         ui/GridDrawer/grid_drawer.hpp \
         ui/GridDrawer/marked_drawer.hpp \
         ui/ImageViewWidget/image_view_widget.hpp \
