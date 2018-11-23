@@ -1,18 +1,18 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef NEURAL_NET_APP_HPP
+#define NEURAL_NET_APP_HPP
 
 #include <QMainWindow>
 
 #include <ui/neural_network_widget.hpp>
 #include <utils/NeuralNetworkSerializer/neural_network_serializer.hpp>
 
-class MainWindow : public QMainWindow
+class NeuralNetsApp : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit MainWindow( QWidget* parent = Q_NULLPTR );
-    ~MainWindow();
+    explicit NeuralNetsApp( QWidget* parent = Q_NULLPTR );
+    ~NeuralNetsApp();
 
 public slots:
     void openNeuralNetwork();
@@ -29,4 +29,4 @@ private:
     NeuralNetworkSerializer* serializer;
 };
 
-#endif /// MAINWINDOW_H
+#endif /// NEURAL_NET_APP_HPP

@@ -20,15 +20,14 @@ SOURCES += \
         main.cpp \
         neural_nets/hebbian_neural_network.cpp \
         neural_nets/hamming_neural_network.cpp \
+        ui/neural_nets_app.cpp \
+        ui/neural_network_widget.cpp \
         ui/GridDrawer/grid_drawer.cpp \
         ui/GridDrawer/marked_drawer.cpp \
-        ui/ImageViewWidget/image_view_widget.cpp \
-        ui/main_window.cpp \
-        ui/neural_network_widget.cpp \
-        utils/data_converters.cpp \
         ui/ImageListViewWidget/image_list_model.cpp \
         ui/ImageListViewWidget/image_list_item_delegate.cpp \
         ui/ImageListViewWidget/image_list_view_widget.cpp \
+        utils/data_converters.cpp \
         utils/NeuralNetworkSerializer/neural_network_serializer.cpp \
         utils/NeuralNetworkSerializer/neural_network_data.cpp \
         utils/NeuralNetworkSerializer/neural_network_learning_sample.cpp
@@ -37,15 +36,14 @@ SOURCES += \
 HEADERS += \
         neural_nets/hebbian_neural_network.hpp \
         neural_nets/hamming_neural_network.hpp \
+        ui/neural_nets_app.hpp \
+        ui/neural_network_widget.hpp \
         ui/GridDrawer/grid_drawer.hpp \
         ui/GridDrawer/marked_drawer.hpp \
-        ui/ImageViewWidget/image_view_widget.hpp \
-        ui/neural_network_widget.hpp \
-        ui/main_window.hpp \
-        utils/data_converters.hpp \
         ui/ImageListViewWidget/image_list_model.hpp \
         ui/ImageListViewWidget/image_list_item_delegate.hpp \
         ui/ImageListViewWidget/image_list_view_widget.hpp \
+        utils/data_converters.hpp \
         utils/NeuralNetworkSerializer/neural_network_serializer.hpp \
         utils/NeuralNetworkSerializer/neural_network_data.hpp \
         utils/NeuralNetworkSerializer/neural_network_learning_sample.hpp

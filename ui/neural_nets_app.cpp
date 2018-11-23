@@ -1,4 +1,4 @@
-#include <ui/main_window.hpp>
+#include <ui/neural_nets_app.hpp>
 
 #include <QMenuBar>
 #include <QStatusBar>
@@ -8,7 +8,7 @@
 #include <QStandardPaths>
 #include <QFile>
 
-MainWindow::MainWindow( QWidget* parent ) :
+NeuralNetsApp::NeuralNetsApp( QWidget* parent ) :
     QMainWindow( parent )
 {   
     /// Menu.
@@ -21,13 +21,13 @@ MainWindow::MainWindow( QWidget* parent ) :
     auto openImageAction = new QAction( "Open image" );
     auto saveImageAction = new QAction( "Save image" );
     connect( openAction, &QAction::triggered,
-             this, &MainWindow::openNeuralNetwork );
+             this, &NeuralNetsApp::openNeuralNetwork );
     connect( saveAction, &QAction::triggered,
-             this, &MainWindow::saveNeuralNetwork );
+             this, &NeuralNetsApp::saveNeuralNetwork );
     connect( openImageAction, &QAction::triggered,
-             this, &MainWindow::openImage );
+             this, &NeuralNetsApp::openImage );
     connect( saveImageAction, &QAction::triggered,
-             this, &MainWindow::saveImage );
+             this, &NeuralNetsApp::saveImage );
     fileMenu->addAction( openAction );
     fileMenu->addAction( saveAction );
     fileMenu->addAction( openImageAction );
@@ -44,11 +44,11 @@ MainWindow::MainWindow( QWidget* parent ) :
     this->setWindowTitle( "AI" );
 }
 
-MainWindow::~MainWindow()
+NeuralNetsApp::~NeuralNetsApp()
 {
 }
 
-void MainWindow::replaceNeuralNetworkWidget(
+void NeuralNetsApp::replaceNeuralNetworkWidget(
         NeuralNetworkWidget* newNeuralNetworkWidget )
 {
     this->setCentralWidget( newNeuralNetworkWidget );
@@ -56,7 +56,7 @@ void MainWindow::replaceNeuralNetworkWidget(
     nnWidget = newNeuralNetworkWidget;
 }
 
-void MainWindow::openNeuralNetwork()
+void NeuralNetsApp::openNeuralNetwork()
 {
     auto fileName = QFileDialog::getOpenFileName(
             this, "Open File",
@@ -73,7 +73,7 @@ void MainWindow::openNeuralNetwork()
     nnWidget->setNeuralNetworkData( data );
 }
 
-void MainWindow::saveNeuralNetwork()
+void NeuralNetsApp::saveNeuralNetwork()
 {
     auto fileName = QFileDialog::getSaveFileName(
             this, "Save File",
@@ -85,7 +85,7 @@ void MainWindow::saveNeuralNetwork()
     serializer->serialize( nnWidget->getNeuralNetworkData() );
 }
 
-void MainWindow::openImage()
+void NeuralNetsApp::openImage()
 {
     auto fileName = QFileDialog::getOpenFileName(
             this, "Open File",
@@ -109,7 +109,7 @@ void MainWindow::openImage()
     nnWidget->setSampleImage( image.convertToFormat( QImage::Format_Mono ) );
 }
 
-void MainWindow::saveImage()
+void NeuralNetsApp::saveImage()
 {
     auto fileName = QFileDialog::getSaveFileName(
             this, "Save File",
