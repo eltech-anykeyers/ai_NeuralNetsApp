@@ -1,5 +1,5 @@
-#ifndef NEURAL_NET_APP_HPP
-#define NEURAL_NET_APP_HPP
+#ifndef NEURAL_NETS_APP_HPP
+#define NEURAL_NETS_APP_HPP
 
 #include <QMainWindow>
 
@@ -29,4 +29,4 @@ private:
     NeuralNetworkSerializer* serializer;
 };
 
-#endif /// NEURAL_NET_APP_HPP
+#endif /// NEURAL_NETS_APP_HPP
