@@ -68,8 +68,8 @@ void NeuralNetsApp::openNeuralNetwork()
     auto data = serializer->deserialize();
 
     replaceNeuralNetworkWidget(
-                new NeuralNetworkWidget( data.getNumberOfNeurons(),
-                                                data.getImageSize() ) );
+                new NeuralNetworkWidget( data.getNeuralNetworkLayers().front().getMatrixWidth(),
+                                         data.getImageSize() ) );
     nnWidget->setNeuralNetworkData( data );
 }
 

@@ -130,18 +130,26 @@ void NeuralNetworkWidget::clear()
 
 NeuralNetworkData NeuralNetworkWidget::getNeuralNetworkData() const
 {
-    NeuralNetworkData data( N_NEURONS, SAMPLE_SIZE );
+    NeuralNetworkData data( SAMPLE_SIZE );
 
-    auto weights = neuralNetwork->getWeights();
-    for( quint32 i = 0; i < N_NEURONS; i++ )
+    auto weightsMatrices = neuralNetwork->getWeightsMatrices();
+    for( const auto& weightsMatrix : weightsMatrices )
     {
-        for( quint32 j = 0; j < data.getInputSize() + 1; j++ )
+        NeuralNetworkWeightsMatrix layer( QSize( qint32( weightsMatrix.width ),
+                                                 qint32( weightsMatrix.height ) ) );
+
+        for( quint32 i = 0; i < weightsMatrix.width; ++i )
         {
-            data.setRelationshipWeight( i, j, weights[ i ][ j ] );
+            for( quint32 j = 0; j < weightsMatrix.height + 1; ++j )
+            {
+                layer.setRelationshipWeight( i, j, weightsMatrix.matrix[ i ][ j ] );
+            }
+            delete[] weightsMatrix.matrix[ i ];
         }
-        delete[] weights[ i ];
+        delete[] weightsMatrix.matrix;
+
+        data.addNeuralNetworkLayer( layer );
     }
-    delete[] weights;
 
     for( const auto& sourceSample : samples )
     {
@@ -173,21 +181,21 @@ NeuralNetworkData NeuralNetworkWidget::getNeuralNetworkData() const
 
 void NeuralNetworkWidget::setNeuralNetworkData( const NeuralNetworkData& data )
 {
-    if( N_NEURONS != data.getNumberOfNeurons() ) throw std::invalid_argument( "invalid number of neurons" );
     if( SAMPLE_SIZE != data.getImageSize() ) throw std::invalid_argument( "invalid image size" );
 
     auto weights = new qreal*[ N_NEURONS ];
-    for( quint32 i = 0; i < N_NEURONS; i++ )
+    const auto& layer = data.getNeuralNetworkLayers().front();
+    for( quint32 i = 0; i < N_NEURONS; ++i )
     {
-        weights[ i ] = new qreal[ data.getInputSize() ];
-        for( quint32 j = 0; j < data.getInputSize(); j++ )
+        weights[ i ] = new qreal[ layer.getMatrixHeight() ];
+        for( quint32 j = 0; j < layer.getMatrixHeight(); ++j )
         {
-            weights[ i ][ j ] = data.getRelationshipWeight( i, j );
+            weights[ i ][ j ] = layer.getRelationshipWeight( i, j );
         }
     }
 
     neuralNetwork = std::make_shared< HebbianNeuralNetwork >(
-                data.getNumberOfNeurons(), data.getInputSize() + 1,
+                layer.getMatrixWidth(), layer.getMatrixHeight(),
                 weights );
 
     for( const auto& sample : data.getLearningData() )

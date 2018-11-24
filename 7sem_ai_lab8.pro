@@ -31,6 +31,7 @@ SOURCES += \
         utils/activation_functions.cpp \
         utils/NeuralNetworkSerializer/neural_network_serializer.cpp \
         utils/NeuralNetworkSerializer/neural_network_data.cpp \
+        utils/NeuralNetworkSerializer/neural_network_weights_matrix.cpp \
         utils/NeuralNetworkSerializer/neural_network_learning_sample.cpp
 
 HEADERS += \
@@ -48,6 +49,7 @@ HEADERS += \
         utils/activation_functions.hpp \
         utils/NeuralNetworkSerializer/neural_network_serializer.hpp \
         utils/NeuralNetworkSerializer/neural_network_data.hpp \
+        utils/NeuralNetworkSerializer/neural_network_weights_matrix.hpp \
         utils/NeuralNetworkSerializer/neural_network_learning_sample.hpp
 
 # Default rules for deployment.
