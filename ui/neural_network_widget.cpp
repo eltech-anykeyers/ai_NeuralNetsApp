@@ -13,19 +13,34 @@
 const char* NeuralNetworkWidget::META_HEADER = "NNW_0.0.1";
 
 NeuralNetworkWidget::NeuralNetworkWidget( QWidget* parent )
-    : NeuralNetworkWidget( 4, QSize( 4, 5 ), parent )
+    : NeuralNetworkWidget( NeuralNetType::HEBBIAN, 4, QSize( 4, 5 ), parent )
 {}
 
 NeuralNetworkWidget::NeuralNetworkWidget(
-        quint32 nNeurons, QSize sampleSize, QWidget* parent )
+        const NeuralNetType type,
+        const quint32 nNeurons, const QSize& sampleSize,
+        QWidget* parent )
     : QWidget( parent )
     , N_NEURONS( nNeurons )
     , SAMPLE_SIZE( sampleSize )
-    , NEURAL_NETWORK_TYPE( NeuralNetType::HEBBIAN )
+    , NEURAL_NETWORK_TYPE( type )
 {    
     /// Create neural network.
-    neuralNetwork = std::make_shared< HebbianNeuralNetwork >(
-                SAMPLE_SIZE.height() * SAMPLE_SIZE.width(), N_NEURONS );
+    switch( NEURAL_NETWORK_TYPE )
+    {
+        case NeuralNetType::HEBBIAN :
+        {
+            neuralNetwork = std::make_shared< HebbianNeuralNetwork >(
+                        SAMPLE_SIZE.height() * SAMPLE_SIZE.width(), N_NEURONS );
+            break;
+        }
+        case NeuralNetType::HAMMING :
+        {
+            neuralNetwork = std::make_shared< HammingNeuralNetwork >(
+                        SAMPLE_SIZE.height() * SAMPLE_SIZE.width(), N_NEURONS );
+            break;
+        }
+    }
 
     /// Create layout with sampleDrawer and control buttons.
     QVBoxLayout* toolsLayout = new QVBoxLayout();
@@ -188,9 +203,10 @@ void NeuralNetworkWidget::setNeuralNetworkData( const NeuralNetworkData& data )
 {
     auto decodedMeta = readMeta( data.getMetaInformation() );
 
+    if( NEURAL_NETWORK_TYPE != decodedMeta.first ) throw std::invalid_argument( "invalid network type" );
     if( SAMPLE_SIZE != decodedMeta.second ) throw std::invalid_argument( "invalid image size" );
 
-    switch( decodedMeta.first )
+    switch( NEURAL_NETWORK_TYPE )
     {
         case NeuralNetType::HEBBIAN :
         {

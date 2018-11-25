@@ -27,8 +27,9 @@ class NeuralNetworkWidget : public QWidget
     Q_OBJECT
 public:
     explicit NeuralNetworkWidget( QWidget* parent = Q_NULLPTR );
-    explicit NeuralNetworkWidget( quint32 nNeurons, QSize sampleSize,
-                                         QWidget* parent = Q_NULLPTR );
+    explicit NeuralNetworkWidget( const NeuralNetType type,
+                                  const quint32 nNeurons, const QSize& sampleSize,
+                                  QWidget* parent = Q_NULLPTR );
 
     NeuralNetworkData getNeuralNetworkData() const;
     void setNeuralNetworkData( const NeuralNetworkData& data );
