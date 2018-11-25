@@ -14,10 +14,12 @@ NeuralNetsApp::NeuralNetsApp( QWidget* parent ) :
     /// Menu.
     QMenuBar* menuBar = new QMenuBar();
     this->setMenuBar( menuBar );
+
+    /// File menu.
     QMenu* fileMenu = new QMenu( "File" );
     menuBar->addMenu( fileMenu );
-    auto openAction = new QAction( "Open" );
-    auto saveAction = new QAction( "Save" );
+    auto openAction = new QAction( "Open neural network" );
+    auto saveAction = new QAction( "Save neural network" );
     auto openImageAction = new QAction( "Open image" );
     auto saveImageAction = new QAction( "Save image" );
     connect( openAction, &QAction::triggered,
@@ -33,14 +35,34 @@ NeuralNetsApp::NeuralNetsApp( QWidget* parent ) :
     fileMenu->addAction( openImageAction );
     fileMenu->addAction( saveImageAction );
 
+    /// Edit menu.
+    QMenu* editMenu = new QMenu( "Edit" );
+    menuBar->addMenu( editMenu );
+    auto editTypeAction = new QAction( "Change neural network type" );
+    auto editSizeAction = new QAction( "Resize image" );
+    auto editNNeuronsAction = new QAction( "Change number of neurons" );
+    connect( editTypeAction, &QAction::triggered,
+             this, &NeuralNetsApp::editNeuralNetworkType );
+    connect( editSizeAction, &QAction::triggered,
+             this, &NeuralNetsApp::editImageSize );
+    connect( editNNeuronsAction, &QAction::triggered,
+             this, &NeuralNetsApp::editNumberOfNeurons );
+    editMenu->addAction( editTypeAction );
+    editMenu->addAction( editSizeAction );
+    editMenu->addAction( editNNeuronsAction );
+
+    /// Status bar.
     QStatusBar* statusBar = new QStatusBar();
     this->setStatusBar( statusBar );
 
+    /// Serializer.
     serializer = new NeuralNetworkSerializer();
 
+    /// Main widget.
     nnWidget = new NeuralNetworkWidget();
     this->setCentralWidget( nnWidget );
 
+    /// Params.
     this->setWindowTitle( "AI" );
 }
 
@@ -67,9 +89,11 @@ void NeuralNetsApp::openNeuralNetwork()
     serializer->setDevice( std::make_unique< QFile >( fileName ) );
     auto data = serializer->deserialize();
 
+    auto decodedMeta = NeuralNetworkWidget::readMeta( data.getMetaInformation() );
     replaceNeuralNetworkWidget(
-            new NeuralNetworkWidget( data.getNeuralNetworkLayers().front().getMatrixWidth(),
-                                     NeuralNetworkWidget::readMeta( data.getMetaInformation() ).second ) );
+            new NeuralNetworkWidget( decodedMeta.first,
+                                     data.getNeuralNetworkLayers().front().getMatrixWidth(),
+                                     decodedMeta.second ) );
     nnWidget->setNeuralNetworkData( data );
 }
 
@@ -119,4 +143,19 @@ void NeuralNetsApp::saveImage()
 
     auto image = nnWidget->getSampleImage();
     image.save( fileName );
+}
+
+void NeuralNetsApp::editNeuralNetworkType()
+{
+
+}
+
+void NeuralNetsApp::editImageSize()
+{
+
+}
+
+void NeuralNetsApp::editNumberOfNeurons()
+{
+
 }

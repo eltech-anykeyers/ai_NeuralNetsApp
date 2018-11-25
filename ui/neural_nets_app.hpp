@@ -19,6 +19,9 @@ public slots:
     void saveNeuralNetwork();
     void openImage();
     void saveImage();
+    void editNeuralNetworkType();
+    void editImageSize();
+    void editNumberOfNeurons();
 
 protected:
     void replaceNeuralNetworkWidget(
