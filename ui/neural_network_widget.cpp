@@ -1,7 +1,11 @@
 #include <ui/neural_network_widget.hpp>
 #include <utils/data_converters.hpp>
 #include <utils/NeuralNetworkSerializer/neural_network_learning_sample.hpp>
+
+#include <QtMath>
+
 #include <QFile>
+#include <QHash>
 
 #include <QGridLayout>
 #include <QHBoxLayout>
@@ -11,6 +15,21 @@
 #include <QListWidget>
 
 const char* NeuralNetworkWidget::META_HEADER = "NNW_0.0.1";
+
+uint qHash( const NeuralNetType& val )
+{
+    return qHash( static_cast< quint32 >( val ) );
+}
+
+qreal distance( const QVector< qreal >& v1, const QVector< qreal >& v2 )
+{
+    qreal result = 0.0;
+    for( qint32 i = 0; i < v1.size(); ++i )
+    {
+        result += qPow( v2[ i ] - v1[ i ], 2.0 );
+    }
+    return qSqrt( result );
+}
 
 NeuralNetworkWidget::NeuralNetworkWidget( QWidget* parent )
     : NeuralNetworkWidget( NeuralNetType::HEBBIAN, 4, QSize( 4, 5 ), parent )
@@ -47,9 +66,29 @@ NeuralNetworkWidget::NeuralNetworkWidget(
     sampleDrawer = new MarkedDrawer( sampleSize );
     toolsLayout->addWidget( sampleDrawer );
 
+    /// Create info layout.
+    QHBoxLayout* infoLayout = new QHBoxLayout();
+
+    static QHash< NeuralNetType, QString > typesNames
+        { { NeuralNetType::HEBBIAN, "Hebbian Neural Network" },
+          { NeuralNetType::HAMMING, "Hamming Neural Network" } };
+
+
+    /// Create result label.
+    auto infoLabel = new QLabel(
+                QString( "Info:\n"
+                         "Type: %1\n"
+                         "Number of neurons: %2\n"
+                         "Image size: %3x%4" )
+                .arg( typesNames[ NEURAL_NETWORK_TYPE ] )
+                .arg( N_NEURONS )
+                .arg( SAMPLE_SIZE.width() )
+                .arg( SAMPLE_SIZE.height() ) );
+    infoLayout->addWidget( infoLabel );
+
     /// Create result label.
     resultLabel = new QLabel();
-    toolsLayout->addWidget( resultLabel );
+    infoLayout->addWidget( resultLabel );
 
     /// Create buttons.
     QPushButton* learnPushButton = new QPushButton( "Learn" );
@@ -73,9 +112,13 @@ NeuralNetworkWidget::NeuralNetworkWidget(
     imageListWidget = new ImageListViewWidget();
 
     /// Create main layout.
-    QHBoxLayout* mainLayout = new QHBoxLayout();
-    mainLayout->addLayout( toolsLayout );
-    mainLayout->addWidget( imageListWidget );
+    QHBoxLayout* neuralNetsLayout = new QHBoxLayout();
+    neuralNetsLayout->addLayout( toolsLayout );
+    neuralNetsLayout->addWidget( imageListWidget );
+
+    QVBoxLayout* mainLayout = new QVBoxLayout();
+    mainLayout->addLayout( infoLayout );
+    mainLayout->addLayout( neuralNetsLayout );
     this->setLayout( mainLayout );
 }
 
@@ -116,7 +159,6 @@ void NeuralNetworkWidget::learn()
 
 void NeuralNetworkWidget::test()
 {
-    ///TODO: Reimplement.
     auto input = DataConverters::convertImage( sampleDrawer->getImage(),
                                                converters::colorToBinary );
     QVector< qreal > result = QVector< qreal >::fromStdVector(
@@ -124,18 +166,26 @@ void NeuralNetworkWidget::test()
 
     if( quint32( result.size() ) != N_NEURONS ) throw std::runtime_error( "bad result" );
 
+    QVector< QPair< QString, qreal > > results;
     for( const auto& sample : samples )
     {
-        if( std::equal( sample.target.begin(), sample.target.end(),
-                        result.begin() ) )
-        {
-            resultLabel->setText(
-                QString("Match found: %1").arg( sample.mark ) );
-            return;
-        }
+        results.append( qMakePair( sample.mark,
+                                   distance( sample.target, result ) ) );
     }
+    std::sort( results.begin(), results.end(),
+               []( QPair< QString, qreal > a, QPair< QString, qreal > b ) -> bool
+               { return a.second < b.second; } );
 
-    resultLabel->setText( QString("Bad result") );
+    QString resultsText = results.front().second == 0.0 ?
+                          QString("Match found: %1.\n").arg( results.front().first ) :
+                          QString("Match not found.\n");
+    for( const auto& result : results )
+    {
+        resultsText += QString( "%1 : %2\n" )
+                       .arg( result.first )
+                       .arg( result.second );
+    }
+    resultLabel->setText( resultsText );
 }
 
 void NeuralNetworkWidget::clear()
