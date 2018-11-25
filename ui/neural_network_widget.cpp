@@ -31,20 +31,20 @@ NeuralNetworkWidget::NeuralNetworkWidget(
         case NeuralNetType::HEBBIAN :
         {
             neuralNetwork = std::make_shared< HebbianNeuralNetwork >(
-                        SAMPLE_SIZE.height() * SAMPLE_SIZE.width(), N_NEURONS );
+                        sampleSize.height() * sampleSize.width(), nNeurons );
             break;
         }
         case NeuralNetType::HAMMING :
         {
             neuralNetwork = std::make_shared< HammingNeuralNetwork >(
-                        SAMPLE_SIZE.height() * SAMPLE_SIZE.width(), N_NEURONS );
+                        sampleSize.height() * sampleSize.width(), nNeurons );
             break;
         }
     }
 
     /// Create layout with sampleDrawer and control buttons.
     QVBoxLayout* toolsLayout = new QVBoxLayout();
-    sampleDrawer = new MarkedDrawer( SAMPLE_SIZE );
+    sampleDrawer = new MarkedDrawer( sampleSize );
     toolsLayout->addWidget( sampleDrawer );
 
     /// Create result label.
@@ -287,14 +287,19 @@ void NeuralNetworkWidget::setSampleImage( const QImage& image )
     sampleDrawer->setImage( image );
 }
 
-QSize NeuralNetworkWidget::getSampleImageSize() const
+const QSize& NeuralNetworkWidget::getSampleImageSize() const
 {
-    return sampleDrawer->getSize();
+    return SAMPLE_SIZE;
 }
 
-void NeuralNetworkWidget::setSampleImageSize( const QSize& size )
+quint32 NeuralNetworkWidget::getNumberOfNeurons() const
 {
-    sampleDrawer->setSize( size );
+    return N_NEURONS;
+}
+
+NeuralNetType NeuralNetworkWidget::getNeuralNetworkType() const
+{
+    return NEURAL_NETWORK_TYPE;
 }
 
 QByteArray NeuralNetworkWidget::createMeta(

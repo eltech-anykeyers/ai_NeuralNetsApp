@@ -28,7 +28,7 @@ class NeuralNetworkWidget : public QWidget
 public:
     explicit NeuralNetworkWidget( QWidget* parent = Q_NULLPTR );
     explicit NeuralNetworkWidget( const NeuralNetType type,
-                                  const quint32 nNeurons, const QSize& sampleSize,
+                                  const quint32 N_NEURONS, const QSize& SAMPLE_SIZE,
                                   QWidget* parent = Q_NULLPTR );
 
     NeuralNetworkData getNeuralNetworkData() const;
@@ -37,8 +37,9 @@ public:
     QImage getSampleImage() const;
     void setSampleImage( const QImage& image );
 
-    QSize getSampleImageSize() const;
-    void setSampleImageSize( const QSize& size );
+    const QSize& getSampleImageSize() const;
+    quint32 getNumberOfNeurons() const;
+    NeuralNetType getNeuralNetworkType() const;
 
     static QByteArray createMeta( const NeuralNetType type, const QSize& size );
     static QPair< NeuralNetType, QSize > readMeta( const QByteArray& meta );

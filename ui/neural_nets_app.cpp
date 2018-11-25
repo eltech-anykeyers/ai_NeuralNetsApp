@@ -4,9 +4,11 @@
 #include <QStatusBar>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QInputDialog>
 
 #include <QStandardPaths>
 #include <QFile>
+#include <QStringList>
 
 NeuralNetsApp::NeuralNetsApp( QWidget* parent ) :
     QMainWindow( parent )
@@ -147,15 +149,65 @@ void NeuralNetsApp::saveImage()
 
 void NeuralNetsApp::editNeuralNetworkType()
 {
+    static QHash< QString, NeuralNetType > types
+        { { "Hebbian Neural Network", NeuralNetType::HEBBIAN },
+          { "Hamming Neural Network", NeuralNetType::HAMMING } };
 
+    QStringList typesList;
+    for( const auto& typesItem : types.keys() )
+    {
+        typesList << typesItem;
+    }
+
+    bool ok;
+    auto typeKey = QInputDialog::getItem(
+                this, "Nural network type",
+                "Choose type of neural network",
+                typesList, 0, false, &ok );
+
+    if( !ok || typeKey.isNull() ) return;
+
+    replaceNeuralNetworkWidget(
+                new NeuralNetworkWidget( types[ typeKey ],
+                                         nnWidget->getNumberOfNeurons(),
+                                         nnWidget->getSampleImageSize() ) );
 }
 
 void NeuralNetsApp::editImageSize()
 {
+    bool ok;
+    auto width = QInputDialog::getInt(
+                this, "Width",
+                "Enter image width",
+                nnWidget->getSampleImageSize().width(),
+                2, 10, 1, &ok );
+    if( !ok ) return;
 
+    auto height = QInputDialog::getInt(
+                this, "Height",
+                "Enter image height",
+                nnWidget->getSampleImageSize().height(),
+                2, 10, 1, &ok );
+    if( !ok ) return;
+
+    replaceNeuralNetworkWidget(
+                new NeuralNetworkWidget( nnWidget->getNeuralNetworkType(),
+                                         nnWidget->getNumberOfNeurons(),
+                                         QSize( width, height ) ) );
 }
 
 void NeuralNetsApp::editNumberOfNeurons()
 {
+    bool ok;
+    auto nNeurons = QInputDialog::getInt(
+                this, "Number of neurons",
+                "Enter number of neurons",
+                qint32( nnWidget->getNumberOfNeurons() ),
+                2, 10, 1, &ok );
+    if( !ok ) return;
 
+    replaceNeuralNetworkWidget(
+                new NeuralNetworkWidget( nnWidget->getNeuralNetworkType(),
+                                         nNeurons,
+                                         nnWidget->getSampleImageSize() ) );
 }
