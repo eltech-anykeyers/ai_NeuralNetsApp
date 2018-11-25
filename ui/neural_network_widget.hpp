@@ -5,14 +5,22 @@
 #include <QVector>
 
 #include <memory>
+#include <vector>
 
+#include <neural_nets/hebbian_neural_network.hpp>
+#include <neural_nets/hamming_neural_network.hpp>
 #include <ui/GridDrawer/marked_drawer.hpp>
 #include <ui/GridDrawer/grid_drawer.hpp>
 #include <ui/ImageListViewWidget/image_list_view_widget.hpp>
-#include <neural_nets/hebbian_neural_network.hpp>
 #include <utils/NeuralNetworkSerializer/neural_network_data.hpp>
 
 #include <QLabel>
+
+enum class NeuralNetType : quint32
+{
+    HEBBIAN,
+    HAMMING
+};
 
 class NeuralNetworkWidget : public QWidget
 {
@@ -31,6 +39,9 @@ public:
     QSize getSampleImageSize() const;
     void setSampleImageSize( const QSize& size );
 
+    static QByteArray createMeta( const NeuralNetType type, const QSize& size );
+    static QPair< NeuralNetType, QSize > readMeta( const QByteArray& meta );
+
 public slots:
     void learn();
     void test();
@@ -44,6 +55,8 @@ private:
         QString mark;
     };
 
+    static const char* META_HEADER;
+
     QVector< Sample > samples;
 
     MarkedDrawer* sampleDrawer;
@@ -56,6 +69,7 @@ private:
 
     const quint32 N_NEURONS;
     const QSize SAMPLE_SIZE;
+    const NeuralNetType NEURAL_NETWORK_TYPE;
 };
 
 #endif /// NEURAL_NETWORK_WIDGET_HPP

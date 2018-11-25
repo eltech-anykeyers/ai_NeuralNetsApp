@@ -10,6 +10,8 @@
 #include <QString>
 #include <QListWidget>
 
+const char* NeuralNetworkWidget::META_HEADER = "NNW_0.0.1";
+
 NeuralNetworkWidget::NeuralNetworkWidget( QWidget* parent )
     : NeuralNetworkWidget( 4, QSize( 4, 5 ), parent )
 {}
@@ -19,7 +21,8 @@ NeuralNetworkWidget::NeuralNetworkWidget(
     : QWidget( parent )
     , N_NEURONS( nNeurons )
     , SAMPLE_SIZE( sampleSize )
-{
+    , NEURAL_NETWORK_TYPE( NeuralNetType::HEBBIAN )
+{    
     /// Create neural network.
     neuralNetwork = std::make_shared< HebbianNeuralNetwork >(
                 SAMPLE_SIZE.height() * SAMPLE_SIZE.width(), N_NEURONS );
@@ -130,7 +133,7 @@ void NeuralNetworkWidget::clear()
 
 NeuralNetworkData NeuralNetworkWidget::getNeuralNetworkData() const
 {
-    NeuralNetworkData data( SAMPLE_SIZE );
+    NeuralNetworkData data;
 
     auto weightsMatrices = neuralNetwork->getWeightsMatrices();
     for( const auto& weightsMatrix : weightsMatrices )
@@ -176,31 +179,69 @@ NeuralNetworkData NeuralNetworkWidget::getNeuralNetworkData() const
         data.addLearningData( sample );
     }
 
+    data.setMetaInformation( createMeta( NEURAL_NETWORK_TYPE, SAMPLE_SIZE ) );
+
     return data;
 }
 
 void NeuralNetworkWidget::setNeuralNetworkData( const NeuralNetworkData& data )
 {
-    if( SAMPLE_SIZE != data.getImageSize() ) throw std::invalid_argument( "invalid image size" );
+    auto decodedMeta = readMeta( data.getMetaInformation() );
 
-    auto weights = new qreal*[ N_NEURONS ];
-    const auto& layer = data.getNeuralNetworkLayers().front();
-    for( quint32 i = 0; i < N_NEURONS; ++i )
+    if( SAMPLE_SIZE != decodedMeta.second ) throw std::invalid_argument( "invalid image size" );
+
+    switch( decodedMeta.first )
     {
-        weights[ i ] = new qreal[ layer.getMatrixHeight() ];
-        for( quint32 j = 0; j < layer.getMatrixHeight(); ++j )
+        case NeuralNetType::HEBBIAN :
         {
-            weights[ i ][ j ] = layer.getRelationshipWeight( i, j );
+            const auto& layer = data.getNeuralNetworkLayers().front();
+            auto weights = new qreal*[ layer.getMatrixWidth() ];
+            for( quint32 i = 0; i < layer.getMatrixWidth(); ++i )
+            {
+                weights[ i ] = new qreal[ layer.getMatrixHeight() ];
+                for( quint32 j = 0; j < layer.getMatrixHeight(); ++j )
+                {
+                    weights[ i ][ j ] = layer.getRelationshipWeight( i, j );
+                }
+            }
+
+            neuralNetwork = std::make_shared< HebbianNeuralNetwork >(
+                        layer.getMatrixWidth(), layer.getMatrixHeight(),
+                        weights );
+            break;
+        }
+        case NeuralNetType::HAMMING :
+        {
+            const auto& weightsLayer = data.getNeuralNetworkLayers()[ 0 ];
+            std::vector< std::vector< double > > weights( weightsLayer.getMatrixWidth() );
+            for( quint32 i = 0; i < weightsLayer.getMatrixWidth(); ++i )
+            {
+                weights[ i ] = std::vector< double >( weightsLayer.getMatrixHeight() );
+                for( quint32 j = 0; j < weightsLayer.getMatrixHeight(); ++j )
+                {
+                    weights[ i ][ j ] = weightsLayer.getRelationshipWeight( i, j );
+                }
+            }
+            const auto& feedbackLayer = data.getNeuralNetworkLayers()[ 1 ];
+            std::vector< std::vector< double > > feedback( weightsLayer.getMatrixWidth() );
+            for( quint32 i = 0; i < feedbackLayer.getMatrixWidth(); ++i )
+            {
+                feedback[ i ] = std::vector< double >( feedbackLayer.getMatrixHeight() );
+                for( quint32 j = 0; j < feedbackLayer.getMatrixHeight(); ++j )
+                {
+                    feedback[ i ][ j ] = feedbackLayer.getRelationshipWeight( i, j );
+                }
+            }
+            neuralNetwork = std::make_shared< HammingNeuralNetwork >(
+                        weightsLayer.getMatrixWidth(), weightsLayer.getMatrixHeight(),
+                        weights, feedback );
+            break;
         }
     }
 
-    neuralNetwork = std::make_shared< HebbianNeuralNetwork >(
-                layer.getMatrixWidth(), layer.getMatrixHeight(),
-                weights );
-
     for( const auto& sample : data.getLearningData() )
     {
-        auto image = QImage( data.getImageSize(), QImage::Format::Format_Mono );
+        auto image = QImage( decodedMeta.second, QImage::Format::Format_Mono );
         std::copy( sample.getInputVector(),
                    sample.getInputVector() + qint32( sample.getInputVectorSize() ),
                    image.bits() );
@@ -238,4 +279,35 @@ QSize NeuralNetworkWidget::getSampleImageSize() const
 void NeuralNetworkWidget::setSampleImageSize( const QSize& size )
 {
     sampleDrawer->setSize( size );
+}
+
+QByteArray NeuralNetworkWidget::createMeta(
+        const NeuralNetType type, const QSize& size )
+{
+    QByteArray result;
+    QDataStream stream( &result, QIODevice::WriteOnly );
+
+    stream << META_HEADER;
+    stream << quint32( type );
+    stream << quint32( size.width() ) << quint32( size.height() );
+
+    return result;
+}
+
+QPair< NeuralNetType, QSize > NeuralNetworkWidget::readMeta( const QByteArray& meta )
+{
+    QDataStream stream( meta );
+
+    char* header;
+    stream >> header;
+    auto validated = strcmp( header, META_HEADER ) == 0;
+    delete[] header;
+
+    if( !validated ) throw std::invalid_argument( "headers doesn't match" );
+
+    quint32 type, w, h;
+    stream >> type >> w >> h;
+
+    return qMakePair( NeuralNetType( type ),
+                      QSize( qint32( w ), qint32( h ) ) );
 }
