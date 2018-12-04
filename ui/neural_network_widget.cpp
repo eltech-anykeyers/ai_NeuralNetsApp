@@ -144,9 +144,21 @@ void NeuralNetworkWidget::learn()
     imageListWidget->model()->addImage( sample.image, sample.mark );
 
     /// Get input.
-    auto input = DataConverters::convertImage( sampleDrawer->getImage(),
-                                               converters::colorToBinary );
+    QVector< qreal > input;
 
+    switch( NEURAL_NETWORK_TYPE )
+    {
+        case NeuralNetType::HAMMING :
+        {
+            input = DataConverters::convertImage( sampleDrawer->getImage(),
+                                                  converters::colorToBipolar );
+        } break;
+        case NeuralNetType::HEBBIAN :
+        {
+            input = DataConverters::convertImage( sampleDrawer->getImage(),
+                                                  converters::colorToBinary );
+        } break;
+    }
 
     neuralNetwork->addSampleToLearningDataSet(
         input.toStdVector(), target.toStdVector() );
@@ -159,8 +171,22 @@ void NeuralNetworkWidget::learn()
 
 void NeuralNetworkWidget::test()
 {
-    auto input = DataConverters::convertImage( sampleDrawer->getImage(),
-                                               converters::colorToBinary );
+    QVector< qreal > input;
+
+    switch( NEURAL_NETWORK_TYPE )
+    {
+        case NeuralNetType::HAMMING :
+        {
+            input = DataConverters::convertImage( sampleDrawer->getImage(),
+                                                  converters::colorToBipolar );
+        } break;
+        case NeuralNetType::HEBBIAN :
+        {
+            input = DataConverters::convertImage( sampleDrawer->getImage(),
+                                                  converters::colorToBinary );
+        } break;
+    }
+
     QVector< qreal > result = QVector< qreal >::fromStdVector(
         neuralNetwork->recognizeSample( input.toStdVector() ) );
 
